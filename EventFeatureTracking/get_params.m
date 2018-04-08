@@ -23,16 +23,18 @@ function [params] = get_params()
 % THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 %% Main parameters to set
+params.write_path = '../../../final/report/tracks/alex_2/alex/checkerboard/tracks.csv';
 % Path to load the data .mat file.
-params.data_path = '../data/indoor_flying1_data.mat';
+params.data_path = '../data/checkerboard.mat';
 % Path to load the undistort_map .mat file.
-params.undistort_map_path = '../data/left_undistort_map.mat';
+params.undistort_map_path = '../undistort_map_checkerboard.mat';
+params.undistort = true;
 % Time in data to start in seconds.
-params.t_start = 5;
+params.t_start = 0.05;
 % Time to stop in seconds. Set to -1 to finish at the end of the bag.
 params.t_end = -1;
 % Number of features to track.
-params.num_features = 30;
+params.num_features = 100;
 % Set to true to default to def_int_time every time. Can be used to have a
 % fixed number of events in each window instead of an adaptive window size.
 params.constant_time = false;
@@ -43,22 +45,22 @@ params.debug = false;
 % scene, needs to be larger than 3 pixels of motion roughly.
 params.def_int_time = 1;
 % Set to true to use the IMU rotations for RANSAC, as in EVIO.
-params.do_ransac = true;
+params.do_ransac = false;
 % If true, tracking will be done inside a parfor loop.
 params.do_parallel = true;
 % Do tracking.
 params.do_tracking = true;
 % Set to true for no plots at all
-params.headless = false;
+params.headless = true;
 % Set to true to use the IMU rotations for the affine step (as in EVIO).
-params.use_imu = true;
+params.use_imu = false;
 % Size of feature window.
 params.window_size = 31;
 
 %% Other params for fine tuning. Usually don't need to touch these.
 % Maximum number of events allowed in a window, upper limit for when the
 % lifetime estimate becomes too high.
-params.max_events_per_window = 30000;
+params.max_events_per_window = 20000;
 % Sets integration time time for flow to move multiplier pixels. Minimum is
 % around 2, 2.5 to be safe.
 params.integration_multiplier = 3;

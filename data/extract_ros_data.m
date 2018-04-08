@@ -1,4 +1,4 @@
-function [] = extract_ros_data(file_name, load_folder, save_folder, cam_name)
+function [] = extract_ros_data(file_name, load_folder, save_folder)
 %EXTRACT_ROS_DATA reads a ROS bag, and saves the events, IMU messages and
 %camera info in a mat file.
 %
@@ -13,8 +13,6 @@ function [] = extract_ros_data(file_name, load_folder, save_folder, cam_name)
 %                  default.
 %    save_folder - folder the mat is saved in. Set to load_folder by
 %                  default.
-%    cam_name    - OPTIONAL name of the event camera topic if not davis or
-%                  dvs.
 %
 % See also GENERATE_UNDISTORT_MAP
 %
@@ -39,14 +37,8 @@ function [] = extract_ros_data(file_name, load_folder, save_folder, cam_name)
 if nargin==1
     load_folder = '.';
 end
-
 if nargin < 3
     save_folder = load_folder;
-end
-
-if nargin == 4
-    fprintf(['Warning: You have set the cam_name argument to ''%s''. ', ...
-        'If this is intentional, please ignore this message.\n'], cam_name)
 end
 
 bag_name = strcat(load_folder,'/', file_name, '.bag');
@@ -60,27 +52,15 @@ event_topics = bag.topics('.*events');
 if isempty(event_topics)
     fprintf('Error, no topic with events found in bag %s\n', bag_name);
     return
-end
-
-if contains(event_topics{1}, 'davis')
-    cam_name = 'davis';
-elseif contains(event_topics{1}, 'dvs')
-    cam_name = 'dvs';
-elseif nargin < 4
-    fprintf(['Could not find the default camera names ''davis'' or ''dvs'' in the bag.', ...
-        'Please enter the camera name as a fourth argument to this function.\n']);
-    return
-end
-
-if length(event_topics) == 1    
-    event_topic = ['/' cam_name '/events'];
-    cinfo_topic = ['/' cam_name '/camera_info'];
-    imu_topic = ['/' cam_name '/imu'];
+elseif length(event_topics) == 1
+    event_topic = '/dvs/events';
+    cinfo_topic = '/dvs/camera_info';
+    imu_topic = '/dvs/imu';
 elseif length(event_topics) == 2
     if contains(event_topics{1}, 'left') || contains(event_topics{2}, 'left')
-        event_topic = ['/' cam_name '/left/events'];
-        cinfo_topic = ['/' cam_name '/left/camera_info'];
-        imu_topic = ['/' cam_name '/left/imu'];
+        event_topic = '/davis/left/events';
+        cinfo_topic = '/davis/left/camera_info';
+        imu_topic = '/davis/left/imu';
     else
         fprintf('No left event topic found despite two event topics found.\n')
     end
@@ -126,5 +106,5 @@ output_name = strcat(save_folder,'/',file_name);
 fprintf('Saving data to %s. This may take some time.\n', output_name)
 
 save(output_name,'file_name','events',...
-    'lin_acc','ang_vel','imu_time', 'cinfo', '-v7.3');
+    'lin_acc','ang_vel','imu_time', 'cinfo','-v7.3');
 end

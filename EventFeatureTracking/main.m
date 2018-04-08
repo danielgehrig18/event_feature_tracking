@@ -54,11 +54,13 @@ if (exist('dataset_loaded', 'var') == 0) || ~strcmp(params.data_path, dataset_lo
     events_zeroed(4,:) = (events_zeroed(4,:)-0.5)*2;
     
     % Undistort events
-    events_zeroed = undistort_events(...
-        events_zeroed, ...
-        undistort_map_x, ...
-        undistort_map_y, ...
-        [rows, cols]);
+    if params.undistort
+        events_zeroed = undistort_events(...
+            events_zeroed, ...
+            undistort_map_x, ...
+            undistort_map_y, ...
+            [rows, cols]);
+    end
     dataset_loaded = params.data_path;
 end
 
@@ -345,6 +347,13 @@ while event_iter < events_end
     iter = iter + 1;
     valid_feature_positions = feature_positions(:, is_valid>0);
     valid_ids = ids(is_valid>0);
+    
+    %% write to file
+    write_time = events_zeroed(3, event_iter);
+    [~, write_rows] = size(valid_feature_positions);
+    append_column = [valid_ids;write_time*ones(1,write_rows);valid_feature_positions]';
+    
+    dlmwrite(params.write_path,append_column,'delimiter',',','-append','precision','%.12f');
     %% Plotting
     if ~params.headless
         set(0, 'CurrentFigure', image_fig)
